@@ -1,0 +1,288 @@
+ <%- include('./partials/header') %>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #60a5fa, #9333ea);
+            color: #374151;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .title {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        li.removing {
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        li p {
+            margin: 8px 0;
+            font-size: 0.95rem;
+            color: #6b7280;
+        }
+
+        .connection-name {
+            font-size: 1.2rem;
+            color: #3b82f6;
+            margin-bottom: 12px;
+        }
+
+        .connection-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+
+        .label {
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-remove {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-remove:hover:not(:disabled) {
+            background-color: #dc2626;
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        .btn.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 5px;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification.success {
+            background-color: #10b981;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .no-connections {
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">My Connections</h1>
+        <div id="notification" class="notification hidden"></div>
+
+        <% if (connections && connections.length > 0) { %>
+            <ul>
+                <% connections.forEach(connection => { %>
+                    <li data-connection-id="<%= connection.userId._id %>">
+                        <div class="connection-name">
+                            <strong><%= connection.userName %></strong>
+                        </div>
+                        <div class="connection-detail">
+                            <span class="label">Role:</span>
+                            <span><%= connection.userRole %></span>
+                        </div>
+                        <div class="connection-detail">
+                            <span class="label">Skills:</span>
+                            <span><%= connection.userSkills.join(', ') %></span>
+                        </div>
+                        <div class="connection-detail">
+                            <span class="label">Interests:</span>
+                            <span><%= connection.userInterests.join(', ') %></span>
+                        </div>
+                        <div class="connection-detail">
+                            <span class="label">Email:</span>
+                            <span><%= connection.userEmail %></span>
+                        </div>
+                        <div class="btn-container">
+                            <button 
+                                class="btn btn-remove"
+                                onclick="removeConnection('<%= connection.userId._id %>')"
+                                data-action="remove">
+                                Remove Connection
+                                <div class="loading-spinner"></div>
+                            </button>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <div class="no-connections">
+                <p>No connections found.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.remove('hidden', 'success', 'error');
+            notification.classList.add(type, 'show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        }
+
+        async function removeConnection(connectionId) {
+            // Get the connection item and button
+            const connectionItem = document.querySelector(`li[data-connection-id="${connectionId}"]`);
+            const button = connectionItem.querySelector('.btn');
+            
+            // Disable button and show loading state
+            button.disabled = true;
+            button.classList.add('loading');
+
+            try {
+                const response = await fetch('/remove-connection', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    body: JSON.stringify({ connectionId }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'An error occurred');
+                }
+
+                // Add removing class for animation
+                connectionItem.classList.add('removing');
+
+                // Wait for animation to complete before removing
+                setTimeout(() => {
+                    connectionItem.remove();
+                    
+                    // Check if there are any remaining connections
+                    const remainingConnections = document.querySelectorAll('li').length;
+                    if (remainingConnections === 0) {
+                        const container = document.querySelector('.container');
+                        const noConnectionsDiv = document.createElement('div');
+                        noConnectionsDiv.className = 'no-connections';
+                        noConnectionsDiv.innerHTML = '<p>No connections found.</p>';
+                        container.appendChild(noConnectionsDiv);
+                    }
+                }, 500);
+
+                showNotification('Connection removed successfully', 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification(error.message || 'An error occurred while removing the connection', 'error');
+                
+                // Re-enable button and remove loading state
+                button.disabled = false;
+                button.classList.remove('loading');
+            }
+        }
+    </script>

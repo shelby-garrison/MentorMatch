@@ -1,0 +1,213 @@
+<%- include('./partials/header') %>
+
+<style>
+    /* Global styles */
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to right, #6ee7b7, #3b82f6); /* Smooth gradient */
+        color: #333;
+       
+    }
+
+    .container {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        padding: 40px;
+        gap: 50px;
+    }
+
+    /* ShopSphere heading */
+    .shop-sphere-heading {
+        font-size: 3.5em;
+        font-weight: 700;
+        color: #3b82f6;
+        margin-bottom: 30px; /* Space between the title and the forms */
+    }
+
+    .shop-sphere-subheading {
+        font-size: 1.5em;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Left and Right sections */
+    .section {
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        transition: transform 0.3s ease;
+    }
+
+    .section:hover {
+        transform: translateY(-10px);
+    }
+
+    /* Form container */
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    h4 {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.25em;
+        margin-bottom: 30px;
+    }
+
+    /* Form styling */
+    .form-input {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 16px;
+        width: 100%;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+    }
+
+    .form-button {
+        background-color: #3b82f6;
+        border: none;
+        border-radius: 8px;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 15px;
+        width: 100%;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .form-button:hover {
+        background-color: #2563eb;
+        transform: scale(1.05);
+    }
+
+    .form-button:active {
+        transform: scale(0.95);
+    }
+
+    .form-button:disabled {
+        background-color: #a5b4fc;
+        cursor: not-allowed;
+    }
+
+    .error-message {
+        background-color: #f87171;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .text-link {
+        color: #60a5fa;
+        text-decoration: none;
+        font-size: 1.1em;
+        margin-top: 10px;
+    }
+
+    .text-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Animation for form inputs */
+    .form-input, .form-button {
+        opacity: 0;
+        animation: fadeIn 0.8s forwards;
+    }
+
+    .form-input:nth-child(1), .form-button:nth-child(1) {
+        animation-delay: 0.2s;
+    }
+
+    .form-input:nth-child(2), .form-button:nth-child(2) {
+        animation-delay: 0.4s;
+    }
+
+    .form-input:nth-child(3), .form-button:nth-child(3) {
+        animation-delay: 0.6s;
+    }
+
+    /* Fade-in animation */
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+            gap: 50px;
+        }
+
+        .section {
+            width: 90%;
+        }
+    }
+</style>
+
+<% if(error.length > 0) { %>
+    <div class="error-message">
+        <span><%= error %></span>
+    </div>
+<% } %>
+
+<div class="container">
+    <!-- ShopSphere Heading -->
+    <div>
+      
+        <div class="shop-sphere-subheading">
+            Your ultimate Mentorship platform
+        </div>
+    </div>
+
+    <!-- Login and Signup containers -->
+    <div class="section">
+        <div class="form-container">
+            <h4>Create your <span style="color: #3b82f6;">MentorMatch</span> account</h4>
+            <form autocomplete="off" action="/users/register" method="post">
+                <input class="form-input" type="text" placeholder="Full Name" name="fullname" required>
+                <input class="form-input" type="email" placeholder="Email" name="email" required>
+                <input class="form-input" type="password" placeholder="Password" name="password" required>
+                <input class="form-button" type="submit" value="Create My Account">
+            </form>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="form-container">
+            <h4>Login to your <span style="color: #3b82f6;">MentorMatch</span> account</h4>
+            <form autocomplete="off" action="/users/login" method="post">
+                <input class="form-input" type="email" placeholder="Email" name="email" required>
+                <input class="form-input" type="password" placeholder="Password" name="password" required>
+                <input class="form-button" type="submit" value="Login">
+            </form>
+           
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>

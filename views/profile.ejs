@@ -1,0 +1,340 @@
+<%- include('./partials/header') %>
+<style>
+         /* Global styles */
+body {
+    font-family: 'Poppins', sans-serif; /* Sleek and modern font */
+    background: linear-gradient(135deg, #4A90E2, #50E3C2); /* Gradient background */
+    color: #333;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+h1 {
+    text-align: center;
+    color: #fff; /* White text for contrast */
+    margin-bottom: 20px;
+    font-size: 2.5em;
+}
+
+/* Dropdown container */
+.dropdown-container {
+    position: relative;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px; /* Limit dropdown width */
+    margin: 0 auto; /* Center dropdown */
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px 16px;
+    background-color: #1F2937; /* Dark header for contrast */
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-header:hover {
+    background-color: #374151; /* Slightly lighter shade on hover */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #F9FAFB; /* Light background for dropdown items */
+    border: 1px solid #D1D5DB; /* Light gray border */
+    border-radius: 8px;
+    margin-top: 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: #1F2937; /* Dark text */
+    font-size: 1em;
+}
+
+.dropdown-item:hover {
+    background-color: #E5E7EB; /* Subtle gray background */
+    color: #4A90E2; /* Highlight text */
+}
+
+.single-select .dropdown-item.selected {
+    background-color: #D1FAE5; /* Light green for selection */
+    font-weight: bold;
+}
+
+.arrow {
+    transition: transform 0.2s ease-in-out;
+}
+
+.arrow.up {
+    transform: rotate(180deg);
+}
+
+/* Selected items */
+.selected-items {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #6B7280; /* Muted text */
+    text-align: center;
+}
+
+/* Form button */
+.form-button {
+    padding: 12px 20px;
+    background-color: #10B981; /* Vibrant green */
+    color: white;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: block;
+    margin: 20px auto;
+    width: fit-content;
+}
+
+.form-button:hover {
+    background-color: #059669; /* Darker green */
+    transform: scale(1.05);
+}
+
+.form-button:active {
+    transform: scale(0.95);
+}
+
+/* Error message */
+.error-message {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background-color: #F87171; /* Red background for errors */
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.current-details {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #1F2937; /* Dark background */
+    border-radius: 12px;
+    color: white; /* White text for contrast */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.current-details h2 {
+    font-size: 1.5em;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #10B981; /* Green text for emphasis */
+}
+
+.current-details .detail {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+
+.current-details .detail span {
+    font-weight: bold;
+    color: #50E3C2; /* Lighter green for key labels */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .dropdown-header, .dropdown-item {
+        font-size: 0.9em;
+        padding: 10px 12px;
+    }
+
+    .form-button {
+        width: 100%;
+    }
+}
+
+</style>
+
+<% if(error.length>0){ %>
+    <div class="absolute top-5 left-1/2 transform -translate-x-1/2 p-3 rounded-md bg-red-500">
+        <span class="inline-block mt-1 mb-1 text-white fade-in">
+            <%= error %>
+        </span>
+    </div>
+<% } %>
+
+<div class="current-details">
+    <h2>Your Current Profile</h2>
+    <div class="detail">
+        <span>Skills:</span> <%= user.skills && user.skills.length > 0 ? user.skills.join(', ') : 'None specified' %>
+    </div>
+    <div class="detail">
+        <span>Interests:</span> <%= user.interests && user.interests.length > 0 ? user.interests.join(', ') : 'None specified' %>
+    </div>
+    <div class="detail">
+        <span>Role:</span> <%= user.role ? user.role : 'None specified' %>
+    </div>
+</div>
+       <form autocomplete="off" action="/profile" method="post">
+                
+                <!-- Skills Dropdown -->
+                <div class="dropdown-container">
+                    <select class="hidden" id="skills" name="skills[]" multiple>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Python">Python</option>
+                        <option value="HTML">HTML</option>
+                        <option value="CSS">CSS</option>
+                        <option value="SQL">SQL</option>
+                        <option value="Java">Java</option>
+                    </select>
+                    <div class="dropdown-header" data-dropdown="skills">
+                        <span>Select Skills</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-content" id="skills-dropdown"></div>
+                    <div class="selected-items" id="selected-skills"></div>
+                </div>
+
+                <!-- Interests Dropdown -->
+                <div class="dropdown-container">
+                    <select class="hidden" id="interests" name="interests[]" multiple>
+                        <option value="Web Development">Web Development</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                        <option value="AI and Machine Learning">AI and Machine Learning</option>
+                        <option value="Cloud Computing">Cloud Computing</option>
+                    </select>
+                    <div class="dropdown-header" data-dropdown="interests">
+                        <span>Select Interests</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-content" id="interests-dropdown"></div>
+                    <div class="selected-items" id="selected-interests"></div>
+                </div>
+
+                <!-- Role Dropdown -->
+                <div class="dropdown-container single-select">
+                    <select class="hidden" id="role" name="role">
+                        <option value="">Select Role</option>
+                        <option value="Mentor">Mentor</option>
+                        <option value="Mentee">Mentee</option>
+                    </select>
+                    <div class="dropdown-header" data-dropdown="role">
+                        <span>Select Role</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-content" id="role-dropdown"></div>
+                </div>  
+                <input class="form-button hover-shadow-light" type="submit" value="Update Profile">
+
+            </form>
+
+            <a href="/match" class="text-lg hover:text-blue-500">Find Matches</a>
+
+<%- include('./partials/footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentOpenDropdown = null;
+
+    function initializeDropdown(selectId, dropdownId, selectedItemsId, isMultiple = true) {
+        const select = document.getElementById(selectId);
+        const dropdown = document.getElementById(dropdownId);
+        const header = dropdown.parentElement.querySelector('.dropdown-header');
+        const headerText = header.querySelector('span');
+
+        Array.from(select.options).forEach(option => {
+            if (!option.value && !isMultiple) return;
+            
+            const item = document.createElement('div');
+            item.className = 'dropdown-item';
+            if (isMultiple) {
+                item.appendChild(Object.assign(document.createElement('input'), {
+                    type: 'checkbox',
+                    value: option.value
+                }));
+            }
+            item.appendChild(Object.assign(document.createElement('span'), {
+                textContent: option.text
+            }));
+            
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isMultiple) {
+                    const checkbox = item.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+                    updateSelection(select, document.getElementById(selectedItemsId));
+                } else {
+                    select.value = option.value;
+                    headerText.textContent = option.text;
+                    dropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                    toggleDropdown(dropdown, header);
+                }
+            });
+            dropdown.appendChild(item);
+        });
+
+        header.addEventListener('click', e => {
+            e.stopPropagation();
+            toggleDropdown(dropdown, header);
+        });
+    }
+
+    function toggleDropdown(dropdown, header) {
+        const isOpen = dropdown.classList.contains('show');
+        if (currentOpenDropdown && currentOpenDropdown !== dropdown) {
+            const currentHeader = currentOpenDropdown.parentElement.querySelector('.dropdown-header');
+            currentOpenDropdown.classList.remove('show');
+            currentHeader.classList.remove('active');
+            currentHeader.querySelector('.arrow').classList.remove('up');
+        }
+        dropdown.classList.toggle('show');
+        header.classList.toggle('active');
+        header.querySelector('.arrow').classList.toggle('up');
+        currentOpenDropdown = isOpen ? null : dropdown;
+    }
+
+    function updateSelection(select, selectedItems) {
+        if (!selectedItems) return;
+        const selectedValues = Array.from(select.parentElement.querySelectorAll('.dropdown-item input:checked')).map(cb => cb.value);
+        Array.from(select.options).forEach(option => option.selected = selectedValues.includes(option.value));
+        selectedItems.textContent = selectedValues.length ? selectedValues.join(', ') : 'None selected';
+    }
+
+    ['skills', 'interests', 'role'].forEach((id, index) => 
+        initializeDropdown(id, `${id}-dropdown`, index < 2 ? `selected-${id}` : null, index < 2));
+
+    document.addEventListener('click', e => {
+        if (currentOpenDropdown && !currentOpenDropdown.contains(e.target) && 
+            !currentOpenDropdown.parentElement.querySelector('.dropdown-header').contains(e.target)) {
+            toggleDropdown(currentOpenDropdown, currentOpenDropdown.parentElement.querySelector('.dropdown-header'));
+        }
+    });
+});
+</script>
+

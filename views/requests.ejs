@@ -1,0 +1,201 @@
+<%- include('./partials/header') %>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #60a5fa, #9333ea);
+        color: #374151;
+        margin: 0;
+        padding: 20px;
+        line-height: 1.6;
+        min-height: 100vh;
+    }
+
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    li {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+        padding: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+
+    li.removing {
+        transform: translateX(100%);
+        opacity: 0;
+        transition: all 0.5s ease;
+    }
+
+    li:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    li h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #3b82f6;
+    }
+
+    li p {
+        margin: 5px 0 0;
+        font-size: 0.95rem;
+        color: #6b7280;
+    }
+
+    .btn-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-accept {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .btn-accept:hover {
+        background-color: #059669;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-decline {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .btn-decline:hover {
+        background-color: #dc2626;
+        box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+    }
+
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 5px;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .notification.success {
+        background-color: #10b981;
+    }
+
+    .notification.error {
+        background-color: #ef4444;
+    }
+
+    .notification.show {
+        opacity: 1;
+    }
+
+    .no-requests {
+        text-align: center;
+        color: white;
+        font-size: 1.1rem;
+        margin-top: 40px;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+    }
+</style>
+
+<div id="notification" class="notification hidden"></div>
+
+<% if (requests && requests.length > 0) { %>
+    <ul>
+        <% requests.forEach(request => { %>
+            <li data-sender-id="<%= request.senderId._id %>">
+                <p><strong><%= request.senderName %></strong> has sent you a request.</p>
+                <p>Role: <%= request.senderRole %></p>
+                <p>Skills: <%= request.senderSkills.join(', ') %></p>
+                <p>Interests: <%= request.senderInterests.join(', ') %></p>
+                <div class="btn-container">
+                    <button class="btn btn-accept" onclick="handleRequest('<%= request.senderId._id %>', 'accept')" 
+                            data-action="accept">Accept</button>
+                    <button class="btn btn-decline" onclick="handleRequest('<%= request.senderId._id %>', 'decline')" 
+                            data-action="decline">Decline</button>
+                </div>
+            </li>
+        <% }); %>
+    </ul>
+<% } else { %>
+    <div class="no-requests">
+        <p>No requests found.</p>
+    </div>
+<% } %>
+
+<%- include('./partials/footer') %>
+
+<script>
+    function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.classList.remove('hidden', 'success', 'error');
+        notification.classList.add(type, 'show');
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 300);
+        }, 3000);
+    }
+
+    function handleRequest(senderId, action) {
+        const requestItem = document.querySelector(`li[data-sender-id="${senderId}"]`);
+        const buttons = requestItem.querySelectorAll('button');
+
+        buttons.forEach(btn => btn.disabled = true);
+
+        fetch(`/handle-request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senderId, action }),
+        })
+        .then(async response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+
+            requestItem.classList.add('removing');
+
+            setTimeout(() => {
+                requestItem.remove();
+                const remainingRequests = document.querySelectorAll('li').length;
+                if (remainingRequests === 0) {
+                    const container = document.querySelector('ul');
+                    container.innerHTML = '<div class="no-requests"><p>No requests found.</p></div>';
+                }
+            }, 500);
+
+            showNotification(data.message, 'success');
+        })
+        .catch(err => {
+            console.error(err);
+            showNotification('An error occurred.', 'error');
+            buttons.forEach(btn => btn.disabled = false);
+        });
+    }
+</script>

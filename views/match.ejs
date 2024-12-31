@@ -1,0 +1,403 @@
+<%- include('./partials/header') %>
+<style>
+   /* Global styles */
+body {
+    font-family: 'Poppins', sans-serif; /* Modern and clean font */
+    background: linear-gradient(135deg, #60a5fa, #9333ea); /* Gradient background with blue and purple */
+    color: #374151; /* Muted dark gray */
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+/* Page heading */
+h1 {
+    text-align: center;
+    color: #ffffff; /* White text for contrast */
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* Form styling */
+form {
+    background: #ffffff; /* White background for contrast */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Strong shadow for elevation */
+    padding: 30px;
+    margin: 0 auto;
+    max-width: 600px; /* Restrict form width */
+}
+
+/* Dropdown container */
+.dropdown-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb; /* Subtle border */
+    border-radius: 8px;
+    background-color: #f3f4f6; /* Light gray background */
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.dropdown-header:hover {
+    border-color: #3b82f6; /* Vibrant blue border on hover */
+    background-color: #e0f2fe; /* Light blue hover effect */
+}
+
+/* Dropdown content */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+    z-index: 1000;
+    max-height: 250px; /* Increased height for more items */
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dropdown items */
+.dropdown-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 1rem;
+    color: #374151; /* Dark text */
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-item:hover {
+    background-color: #f9fafb; /* Light background */
+    color: #3b82f6; /* Blue text highlight */
+}
+
+.selected-items {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #6b7280; /* Muted text */
+}
+
+/* Submit button */
+.form-button {
+    background: linear-gradient(135deg, #3b82f6, #2563eb); /* Vibrant gradient button */
+    color: white;
+    border-radius: 8px;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: block;
+    margin: 0 auto;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.form-button:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af); /* Darker gradient on hover */
+    transform: scale(1.05); /* Slight zoom */
+}
+
+.form-button:active {
+    transform: scale(0.98); /* Subtle click feedback */
+}
+
+/* Profile list */
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+li {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle elevation */
+    margin-bottom: 15px;
+    padding: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+li:hover {
+    transform: translateY(-5px); /* Slight lift effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+li h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #3b82f6; /* Blue for emphasis */
+}
+
+li p {
+    margin: 5px 0 0;
+    font-size: 0.95rem;
+    color: #6b7280; /* Muted gray */
+}
+.no-users-message {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Lower z-index to prevent overlapping the dropdowns */
+    pointer-events: none; /* Ensure it doesn't block interactions with other elements */
+}
+
+.no-users-message div {
+    pointer-events: auto; /* Allow interactions with the message itself */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    form {
+        padding: 20px;
+    }
+
+    .form-button {
+        font-size: 1rem;
+    }
+
+    li h2 {
+        font-size: 1rem;
+    }
+
+    li p {
+        font-size: 0.85rem;
+    }
+}
+.connection-button {
+    background: linear-gradient(135deg, #3b82f6, #9333ea); /* Vibrant gradient */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px; /* Space between button and other elements */
+    display: inline-block;
+}
+
+.connection-button:hover {
+    background: linear-gradient(135deg, #2563eb, #7e22ce); /* Darker gradient on hover */
+    transform: scale(1.05); /* Slight zoom effect */
+}
+
+.connection-button:active {
+    transform: scale(0.98); /* Subtle feedback on click */
+}
+
+
+</style>
+
+<form autocomplete="off" action="/match" method="post">
+                
+    <!-- Skills Dropdown -->
+    <div class="dropdown-container">
+        <select class="hidden" id="skills" name="skills[]" multiple>
+            <option value="JavaScript">JavaScript</option>
+            <option value="Python">Python</option>
+            <option value="HTML">HTML</option>
+            <option value="CSS">CSS</option>
+            <option value="SQL">SQL</option>
+            <option value="Java">Java</option>
+            <!-- Add more skills as needed -->
+        </select>
+        
+         <div class="dropdown-header" data-dropdown="skills">
+            <span>Select Skills</span>
+            <span class="arrow">▼</span>
+         </div>
+         <div class="dropdown-content" id="skills-dropdown"></div>
+         <div class="selected-items" id="selected-skills"></div>
+     </div>
+
+     <!-- Interests Dropdown -->
+     <div class="dropdown-container">
+         <select class="hidden" id="interests" name="interests[]" multiple>
+             <option value="Web Development">Web Development</option>
+             <option value="Data Science">Data Science</option>
+             <option value="Cybersecurity">Cybersecurity</option>
+             <option value="AI and Machine Learning">AI and Machine Learning</option>
+             <option value="Cloud Computing">Cloud Computing</option>
+             <!-- Add more interests as needed -->
+         </select>
+         <div class="dropdown-header" data-dropdown="interests">
+             <span>Select Interests</span>
+             <span class="arrow">▼</span>
+         </div>
+         <div class="dropdown-content" id="interests-dropdown"></div>
+         <div class="selected-items" id="selected-interests"></div>
+     </div>
+
+     <!-- Role Dropdown -->
+     <div class="dropdown-container">
+         <select class="hidden" id="role" name="role">
+             <option value="">Select Role</option>
+             
+             <option value="Mentor"> Mentor</option>
+             <option value="Mentee"> Mentee</option>
+         </select>
+         <div class="dropdown-header" data-dropdown="role">
+             <span>Select Role</span>
+             <span class="arrow">▼</span>
+         </div>
+         <div class="dropdown-content" id="role-dropdown"></div>
+     </div>  
+
+     <!-- Submit Button -->
+     <input class="form-button hover-shadow-light" type="submit" value="Submit">
+</form>
+ 
+<% if (users.length === 0) { %>
+    <div class="no-users-message">
+        <div class="p-3 rounded-md bg-red-500 transform translate-y-40">
+            <span class="inline-block mt-1 mb-1 text-white fade-in">No users found!</span>
+        </div>
+    </div>
+<% } %>
+
+
+<ul>
+    <% Array.prototype.forEach.call(users, user => { %>
+        <li>
+            <h2>Name: <%= user.fullname %></h2>
+            <p>Role: <%= user.role %></p>
+            <p>Skills: <%= user.skills.join(', ') %></p>
+            <p>Interests: <%= user.interests.join(', ') %></p>
+            
+            <!-- Request Connection Button -->
+            <button class="connection-button" onclick="requestConnection('<%= user._id %>')">Request Connection</button>
+        </li>
+    <% }) %>
+</ul>
+
+<%- include('./partials/footer') %>
+
+<script>
+// JavaScript for dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    let currentOpenDropdown = null;
+
+    function initializeDropdown(selectId, dropdownId, selectedItemsId, isMultiple = true) {
+       const select = document.getElementById(selectId);
+       const dropdown = document.getElementById(dropdownId);
+       const header = dropdown.parentElement.querySelector('.dropdown-header');
+       const headerText = header.querySelector('span');
+
+       Array.from(select.options).forEach(option => {
+           if (!option.value && !isMultiple) return;
+
+           const item = document.createElement('div');
+           item.className = 'dropdown-item';
+           if (isMultiple) {
+               item.appendChild(Object.assign(document.createElement('input'), {
+                   type: 'checkbox',
+                   value: option.value
+               }));
+           }
+           item.appendChild(Object.assign(document.createElement('span'), {
+               textContent: option.text
+           }));
+
+           item.addEventListener('click', (e) => {
+               e.stopPropagation();
+               if (isMultiple) {
+                   const checkbox = item.querySelector('input');
+                   checkbox.checked = !checkbox.checked; // Toggle checkbox state
+                   updateSelection(select, document.getElementById(selectedItemsId));
+               } else {
+                   select.value = option.value; // Set selected role
+                   headerText.textContent = option.text; // Update header text
+                   dropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
+                   item.classList.add('selected');
+                   toggleDropdown(dropdown, header);
+               }
+           });
+           dropdown.appendChild(item);
+       });
+
+       header.addEventListener('click', e => {
+           e.stopPropagation();
+           toggleDropdown(dropdown, header);
+       });
+   }
+
+   function toggleDropdown(dropdown, header) {
+       const isOpen = dropdown.classList.contains('show');
+       if (currentOpenDropdown && currentOpenDropdown !== dropdown) {
+           const currentHeader = currentOpenDropdown.parentElement.querySelector('.dropdown-header');
+           currentOpenDropdown.classList.remove('show');
+           currentHeader.classList.remove('active');
+           currentHeader.querySelector('.arrow').classList.remove('up');
+       }
+       dropdown.classList.toggle('show');
+       header.classList.toggle('active');
+       header.querySelector('.arrow').classList.toggle('up');
+       currentOpenDropdown = isOpen ? null : dropdown; // Track the currently open dropdown
+   }
+
+   function updateSelection(select, selectedItems) {
+       if (!selectedItems) return;
+
+       const selectedValues = Array.from(select.parentElement.querySelectorAll('.dropdown-item input[type=checkbox]:checked')).map(cb => cb.value);
+       Array.from(select.options).forEach(option => option.selected = selectedValues.includes(option.value));
+       selectedItems.textContent = selectedValues.length ? selectedValues.join(', ') : 'None selected';
+   }
+
+   ['skills', 'interests', 'role'].forEach((id, index) =>
+       initializeDropdown(id, `${id}-dropdown`, index < 2 ? `selected-${id}` : null, index < 2));
+
+   document.addEventListener('click', e => {
+       if (currentOpenDropdown && !currentOpenDropdown.contains(e.target) &&
+           !currentOpenDropdown.parentElement.querySelector('.dropdown-header').contains(e.target)) {
+           toggleDropdown(currentOpenDropdown, currentOpenDropdown.parentElement.querySelector('.dropdown-header'));
+       }
+   });
+});
+async function requestConnection(userId) {
+    fetch('/send-request', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+    }).then(async (response) => {
+    if (response.ok) {
+        const data = await response.json();
+        console.log(data.message)
+        alert(data.message); // Displays success message from backend
+       
+    } else {
+        const errorData = await response.json(); // Get error message if available
+        alert(errorData.message || 'Failed to send connection request.'); // Displays specific error message or a default one
+    }
+})
+.catch(error => console.error('Error:', error));
+
+}
+
+</script>
+
