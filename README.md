@@ -52,7 +52,20 @@ MONGODB_URI= your_mongodb_uri
 npm install
 ```
 
-### 4. Run the Server
+### 4. Set Up the Database
+
+This app uses MongoDB with Mongoose to store user and product data. To get started:
+
+Run MongoDB locally using MongoDB Compass or through the MongoDB command-line tools. If you prefer a GUI, MongoDB Compass is a good option for managing your local MongoDB instance.
+
+OR connect to a cloud instance using MongoDB Atlas, which provides a fully managed cloud database service for MongoDB. You'll need to create a MongoDB Atlas account and set up a cluster, then update the connection string in your .env file.
+
+
+
+
+
+
+### 5. Run the Server
 
 ```bash
 node app.js
