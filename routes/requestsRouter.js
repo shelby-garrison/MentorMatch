@@ -11,11 +11,11 @@ router.get("/",isloggedin, async function (req, res) {
   .findOne({email: req.user.email})
   .populate("mentorshipRequests.senderId");
   let requests = user.mentorshipRequests.map(request => ({
-    senderId: request.senderId,  // You can access sender's details here
+    senderId: request.senderId,  // access sender's details here
     senderSkills: request.senderId.skills,
     senderInterests: request.senderId.interests,
     senderRole: request.senderId.role,
-    senderName: request.senderId.fullname, // Assuming the sender has a `fullname` field
+    senderName: request.senderId.fullname, 
   }));
   res.render("requests", {requests});
 });
